@@ -61,9 +61,12 @@ rsis <- function() {
     currnames <- names(df)
     nwnames <- gsub("\\.mean\\.+"," mean ", currnames)
     nwnames <- gsub("\\.std\\.+"," std dev ", nwnames)
-    nwnames <- gsub("\\.meanFreq\\.+"," mean frequency", nwnames)
+    nwnames <- gsub("\\.meanFreq\\.+"," mean frequency ", nwnames)
     nwnames <- sub("label_name","activity_name", nwnames)
     nwnames <- sub("label","activity_id", nwnames)
+    library(stringr)
+    nwnames <- str_trim(nwnames)
+    nwnames <- gsub(" ","_", nwnames)
     colnames(df) = nwnames
     
     # create average of each variable for each activity and each subject
@@ -72,9 +75,10 @@ rsis <- function() {
     grpd <- group_by(df,subject,activity_id,activity_name)
     mngrp <- summarise_each(grpd,funs(mean))
     # add descriptive column names
-    colnames(mngrp) <- append(names(mngrp)[1:3],sub("^","mean ",names(mngrp)[-c(1:3)]))
+    colnames(mngrp) <- append(names(mngrp)[1:3],sub("^","mean_",names(mngrp)[-c(1:3)]))
     
     message("Writing data to file...")
     write.table(mngrp, file = paste0(dirn,"/resultset.txt"), row.name = FALSE)
+    print(mngrp)
     message("Function end")
 }
